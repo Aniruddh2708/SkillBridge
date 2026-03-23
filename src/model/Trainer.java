@@ -19,7 +19,7 @@ public class Trainer extends User {
         this.roster = new ArrayList<>();
     }
 
-    // --- Abstract method implementations ---
+    // --- Overrides ---
 
     @Override
     public boolean login(String password) {
