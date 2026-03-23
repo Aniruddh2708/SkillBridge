@@ -24,9 +24,7 @@ public class Trainer extends User {
     private List<Trainee> roster;
 
     // ── Trainer-specific field ────────────────────────────────────────────────
-    // TODO M1-3a: declare a private List<Trainee> field called roster
-    //             Why ArrayList? Fast index access; trainer rosters are
-    //             typically iterated, not searched by key.
+    // (M1-3a complete — roster declared above)
 
 
     // ── Constructor ──────────────────────────────────────────────────────────
@@ -39,8 +37,24 @@ public class Trainer extends User {
     public Trainer(String userId, String name, String email, String passwordHash) {
         super(userId,name,email,passwordHash);
         this.roster=new ArrayList<>();
-        // TODO M1-3b: call super(...) with all four parameters
-        //             Then initialise the roster field to a new ArrayList<>()
+    }
+
+
+    // ── login() ──────────────────────────────────────────────────────────────
+    /**
+     * Authenticates this trainer.
+     *
+     * TODO M1-3g: Implement a simple guard: return true if password is not null
+     *             and not empty — the same pattern Trainee.login() uses.
+     *             Real credential-check with password hash comparison
+     *             will be added in M3 (JDBC layer).
+     *
+     *   return password != null && !password.isEmpty();
+     */
+    @Override
+    public boolean login(String password) {
+        // TODO M1-3g: replace this stub with your real check
+        return false;
     }
 
 
@@ -51,7 +65,6 @@ public class Trainer extends User {
      */
     @Override
     public String getRole() {
-        // TODO M1-3c: return the string "TRAINER"
         return "TRAINER";
     }
 
@@ -64,8 +77,6 @@ public class Trainer extends User {
      * @throws IllegalArgumentException if trainee is null
      */
     public void enrollTrainee(Trainee trainee) {
-        // TODO M1-3d: validate that trainee is not null (throw IllegalArgumentException if so)
-        //             Then add trainee to the roster list.
         if(trainee==null)
         {
             throw new IllegalArgumentException("Trainee cannot be null");
@@ -81,9 +92,6 @@ public class Trainer extends User {
      * @return unmodifiable List of Trainees
      */
     public List<Trainee> getRoster() {
-
-        // TODO M1-3e: return Collections.unmodifiableList(roster)
-        //             Remember to import java.util.Collections
         return Collections.unmodifiableList(roster);
     }
 
@@ -94,7 +102,6 @@ public class Trainer extends User {
      */
     @Override
     public String toString() {
-        // TODO M1-3f: use super.toString() for the User part, then append roster size.
-        return "Trainer{base="+super.toString()+", roster="+this.roster.size()+" trainee(s)";
+        return "Trainer{base="+super.toString()+", roster="+this.roster.size()+" trainee(s)}";
     }
 }

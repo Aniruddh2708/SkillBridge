@@ -23,11 +23,49 @@
 ### M1 Checklist
 
 - [x] **M1-1** Understand *why* `User` is abstract — concept discussion ✅
-- [ ] **M1-2** Complete `User.java` TODOs (fields, constructor, abstract method, getters, `toString`)
-- [ ] **M1-3** Complete `Trainer.java` TODOs (override `getRole`, trainer-specific fields)
-- [ ] **M1-4** Complete `Trainee.java` TODOs (override `getRole`, `Serializable`, trainee-specific fields)
-- [ ] **M1-5** Complete `Skill.java` TODOs (skill model, enums, completion flag)
+- [x] **M1-2** Complete `User.java` TODOs (fields, constructor, abstract method, getters, `toString`) ✅ *(see review notes below)*
+- [x] **M1-3** Complete `Trainer.java` TODOs (override `getRole`, trainer-specific fields) ✅ *(see review notes below)*
+- [x] **M1-4** Complete `Trainee.java` TODOs (override `getRole`, `Serializable`, trainee-specific fields) ✅
+- [ ] **M1-5** Complete `Skill.java` TODOs (skill model, enums, completion flag) ← **CURRENT TASK**
 - [ ] **M1-6** Complete `SkillAssessor.java` TODOs (abstract assessor, polymorphism demo)
+
+---
+
+## ✅ Code Review — M1-2 (`User.java`)
+
+Good job getting all the core pieces in place! A few things to polish when you
+get a chance (they won't block you from M1-5, but are worth knowing):
+
+| # | Issue | What to change |
+|---|-------|----------------|
+| 1 | Fields declared `protected` | The guide recommends `private` — subclasses should use inherited getters, not reach directly into parent fields |
+| 2 | Missing `passwordHash` field | You stored `role` as a field but `role` is dynamic (returned by `getRole()`). The parent should hold `passwordHash` instead |
+| 3 | `toString()` missing closing `'}` | Current output: `User{id='TR-001', name='Riya', role='TRAINER` — add `+ "'}"` at the end |
+| 4 | Missing `getPasswordHash()` | Needed by the DAO in M3 to compare stored hashes at login time |
+
+---
+
+## ✅ Code Review — M1-3 (`Trainer.java`)
+
+Great structure! One fix was needed to make the code compile:
+
+| # | Issue | Fix applied |
+|---|-------|-------------|
+| 1 | `login()` not implemented | Added a `login()` stub with **TODO M1-3g** for you to complete — see the method in `Trainer.java` |
+| 2 | `toString()` missing closing `'}` | Fixed — was `"... trainee(s)"`, now `"... trainee(s)}"` |
+
+> **Your action:** Open `Trainer.java` and complete **TODO M1-3g** — implement
+> `login()` the same way `Trainee.login()` works.
+
+---
+
+## ✅ Code Review — M1-4 (`Trainee.java`)
+
+Excellent — all TODOs are done! One tiny cosmetic issue:
+
+| # | Issue | What to change |
+|---|-------|----------------|
+| 1 | Missing space in `enrollInSkill` print | `name+"enrolled in: "` → `name + " enrolled in: "` (space before "enrolled") |
 
 ---
 
@@ -178,6 +216,58 @@ Two things to notice:
 
 **Your task:** Go implement all ten TODOs in `src/model/User.java` now.
 Once you've written them, come back and we'll move to M1-3 (`Trainer.java`).
+
+---
+
+## 🔓 M1-5 Unlocked — Filling in `Skill.java`
+
+Open `src/model/Skill.java` now. Work through the TODOs in order.
+
+---
+
+### M1-5 Concept Background — Why an Enum for SkillLevel?
+
+A `Skill` in SkillBridge can be tagged as `BEGINNER`, `INTERMEDIATE`, or `ADVANCED`.
+You could represent that with a plain `String`, but using a **nested enum** is better:
+
+| Plain String | Enum |
+|---|---|
+| `"BEGINNER"`, `"beginner"`, `"Begginer"` all compile | Only `SkillLevel.BEGINNER` compiles |
+| Equality bugs: `==` vs `.equals()` | Safe with `==` or `switch` |
+| No IDE auto-complete for valid values | Full IDE support |
+
+Nested enums are declared *inside* the class that owns them:
+
+```java
+public class Skill {
+    public enum SkillLevel {
+        BEGINNER, INTERMEDIATE, ADVANCED
+    }
+    // rest of Skill...
+}
+```
+
+They're accessed from outside as `Skill.SkillLevel.BEGINNER`.
+
+---
+
+### M1-5 Concept Background — Why a `markCompleted()` method instead of a setter?
+
+A dedicated `markCompleted()` method only allows the **one-way transition** from
+`false → true`.  A plain `setIsCompleted(boolean)` would let callers pass `false`
+and "uncomplete" a skill — usually unintended and a potential data-integrity bug.
+
+This is a common OOP practice: *make illegal states unrepresentable* in the API itself.
+
+---
+
+### Concept Question for M1-5
+
+> **Before you write a single line of code:**
+> "If you later need a fourth skill level — say `EXPERT` — what change do you make
+> to a String-based design versus an enum-based design, and which is safer? Why?"
+
+*Answer this question in your next message, then implement all six TODOs in `Skill.java`.*
 
 ---
 
