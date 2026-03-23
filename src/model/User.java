@@ -43,6 +43,6 @@ public abstract class User {
     // --- toString ---
     @Override
     public String toString() {
-        return "[" + role + "] " + name + " <" + email + "> (ID: " + userId + ")";
+        return "[" + getRole() + "] " + name + " <" + email + "> (ID: " + userId + ")";
     }
 }

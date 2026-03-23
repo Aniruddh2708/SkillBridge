@@ -65,12 +65,19 @@ Update it after completing each task.
    ```
 2. Write a quick `Main.java` smoke test:
    ```java
-   Trainer t = new Trainer("Mr. Sharma", "sharma@geu.ac.in", "TR01");
-   Trainee alice = new Trainee("Alice", "alice@geu.ac.in", "TN01", "TR01");
-   alice.enrollInSkill("Electrician");
-   alice.updateProgress(100);
-   alice.exportPortfolio();
-   t.enrollTrainee(alice);
-   t.printRoster();
+   import model.Trainer;
+   import model.Trainee;
+
+   public class Main {
+       public static void main(String[] args) {
+           Trainer t = new Trainer("Mr. Sharma", "sharma@geu.ac.in", "TR01");
+           Trainee alice = new Trainee("Alice", "alice@geu.ac.in", "TN01", "TR01");
+           alice.enrollInSkill("Electrician");
+           alice.updateProgress(100);
+           alice.exportPortfolio();
+           t.enrollTrainee(alice);
+           t.printRoster();
+       }
+   }
    ```
 3. Once M1-3 is done, move on to **M2-1: Skill.java** (simple POJO).

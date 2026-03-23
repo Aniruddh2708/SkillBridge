@@ -53,17 +53,17 @@ public class Trainee extends User implements Serializable {
 
     // -------------------------------------------------------------------------
     // TODO 3 — OVERRIDE login()
-    // The abstract method login(String password) from User must be implemented.
+    // Override the login(String password) method inherited from User.
     // For now, return true if password is not null and not empty — real auth
     // will come in M3 with JDBC.
     //
-    // Replace the stub body below with your implementation:
+    // Implement the body as:
     //   return password != null && !password.isEmpty();
     // -------------------------------------------------------------------------
     @Override
     public boolean login(String password) {
-        // TODO 3: replace this stub with your real check
-        return password != null && !password.isEmpty();
+        // TODO 3: implement — return password != null && !password.isEmpty();
+        return false;
     }
 
     // -------------------------------------------------------------------------
@@ -76,7 +76,7 @@ public class Trainee extends User implements Serializable {
     @Override
     public String getRole() {
         // TODO 4: replace this stub with the correct return value
-        return "";
+        return "TRAINEE";
     }
 
     // -------------------------------------------------------------------------
