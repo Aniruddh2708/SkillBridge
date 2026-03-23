@@ -24,7 +24,7 @@
 
 - [x] **M1-1** Understand *why* `User` is abstract — concept discussion ✅
 - [x] **M1-2** Complete `User.java` TODOs (fields, constructor, abstract method, getters, `toString`) ✅
-- [ ] **M1-3** Complete `Trainer.java` TODOs (override `getRole`, trainer-specific fields)
+- [x] **M1-3** Complete `Trainer.java` TODOs (override `getRole`, trainer-specific fields) ✅
 - [ ] **M1-4** Complete `Trainee.java` TODOs (override `getRole`, `Serializable`, trainee-specific fields)
 - [ ] **M1-5** Complete `Skill.java` TODOs (skill model, enums, completion flag)
 - [ ] **M1-6** Complete `SkillAssessor.java` TODOs (abstract assessor, polymorphism demo)
@@ -112,94 +112,166 @@ assertNotEquals(Modifier.PUBLIC, m.getModifiers() & Modifier.PUBLIC);
 
 ---
 
-## 🔓 M1-3 Unlocked — `Trainer.java`
+## ✅ M1-3 Complete — `Trainer.java` Review
 
-Before we look at the code skeleton, answer this concept question:
-
-### Concept Question for M1-3
+### Concept Question for M1-3 — Answered ✅
 
 > **"When `Trainer`'s constructor calls `super(userId, name, email, passwordHash)`,
 > what does `super(...)` actually do — and what would happen if you forgot to call it?"**
+
+**✅ M1-3 ANSWERED:**
+> *"`super(...)` calls the `User` constructor, which initialises the four inherited fields
+> (`userId`, `name`, `email`, `passwordHash`). Those fields belong to `User`, so only `User`'s
+> constructor can set them. If you forgot `super(...)`, Java would emit a compile-time error
+> because every subclass constructor must (explicitly or implicitly) invoke a parent
+> constructor. Without it, the inherited fields would never be assigned — all User getters
+> would return `null`."*
+
+**Feedback:** Exactly right. Java *enforces* the super-constructor call at compile time,
+which is why there is no silent null-field bug to hunt down at runtime. You also correctly
+noted that the fields live in `User`, not in `Trainer` — that ownership is the reason
+`Trainer` cannot initialise them directly.
+
+---
+
+### What you got right ✅
+
+| TODO | Your implementation | Why it's correct |
+|------|--------------------|--------------------|
+| M1-3a | `private List<Trainee> roster` | Declared as the `List` interface — programming to the interface, not the implementation |
+| M1-3b | `super(...); this.roster = new ArrayList<>()` | Delegates field init to `User`; creates an empty, ready-to-use roster |
+| M1-3c | `return "TRAINER";` | Satisfies the abstract contract; string literal matches what the login router expects |
+| M1-3d | null-check + `roster.add(trainee)` | Catches bad input at the boundary; prevents silent `NullPointerException` later |
+| M1-3e | `Collections.unmodifiableList(roster)` | Encapsulates the list; callers can read but not mutate directly |
+| M1-3f | `super.toString()` + roster size | Reuses `User`'s representation (DRY); `size()` gives a concise summary |
+
+### One thing to note 📌
+
+`getRoster()` returns an *unmodifiable view* — it wraps the original list rather than
+copying it. That means:
+- Reads (iteration, `get(i)`) work fine.
+- Any write call (`add`, `remove`) throws `UnsupportedOperationException` at runtime.
+- The underlying `roster` field itself is still mutable via `enrollTrainee()`.
+
+This pattern (expose a restricted view, keep the real list private) is called
+**defensive copying** in spirit, and is standard practice for collection-returning getters.
+
+---
+
+## 🔓 M1-4 Unlocked — `Trainee.java`
+
+Before we look at the code skeleton, answer this concept question:
+
+### Concept Question for M1-4
+
+> **"`Trainee` implements `Serializable` — but `Serializable` has no methods to implement.
+> What is a *marker interface*, why does Java use them, and what does `serialVersionUID`
+> protect against?"**
 >
-> *(Hint: think about which class owns those four fields and how they get initialised.)*
+> *(Hint: think about what the JVM checks before writing an object to a file, and what
+> happens if you load that file after adding a new field to the class.)*
 
 ---
 
-Once you've answered, open `src/model/Trainer.java` and work through the six TODOs in order:
+Once you've answered, open `src/model/Trainee.java` and work through the nine TODOs in order:
 
-### M1-3a — `List<Trainee> roster` field
-
-```
-// TODO M1-3a: declare a private List<Trainee> field called roster
-```
-
-- `List` (the interface) is the declared type — programming to the interface, not
-  the implementation. Callers only know it's a List.
-- The concrete type (`ArrayList`) is chosen inside the constructor.
-
-### M1-3b — Constructor
+### M1-4a — `List<Skill> skills` field
 
 ```
-// TODO M1-3b: call super(...) with all four parameters
-//             Then initialise the roster field to a new ArrayList<>()
+// TODO M1-4a: declare a private List<Skill> field called skills
 ```
 
-Two lines:
-1. `super(userId, name, email, passwordHash);` — delegates field assignment to `User`.
-2. `this.roster = new ArrayList<>();` — empty list ready for enrolments.
+- Same pattern as `Trainer`'s roster: declare the interface type (`List`), initialise
+  with `ArrayList` in the constructor.
+- This list holds every `Skill` assigned to or completed by the trainee.
 
-### M1-3c — `getRole()`
-
-```
-// TODO M1-3c: return the string "TRAINER"
-```
-
-One line. This satisfies the abstract contract from `User`.
-
-### M1-3d — `enrollTrainee(Trainee trainee)`
+### M1-4b — `String enrolledCourse` field
 
 ```
-// TODO M1-3d: validate that trainee is not null (throw IllegalArgumentException if so)
-//             Then add trainee to the roster list.
+// TODO M1-4b: declare a private String field called enrolledCourse
+```
+
+- Stores the name of the vocational course the trainee is enrolled in
+  (e.g. `"Electrical Wiring Basics"`).
+- Not `final` — a trainee *can* switch courses (the setter in M1-4h handles this).
+
+### M1-4c — Constructor
+
+```
+// TODO M1-4c: call super(...) with userId, name, email, passwordHash
+//             Then initialise the skills list and assign enrolledCourse.
+```
+
+Three lines:
+1. `super(userId, name, email, passwordHash);` — delegates the four inherited fields to `User`.
+2. `this.skills = new ArrayList<>();` — empty list, ready for skill assignment.
+3. `this.enrolledCourse = enrolledCourse;` — stores the course name.
+
+### M1-4d — `getRole()`
+
+```
+// TODO M1-4d: return the string "TRAINEE"
+```
+
+One line. Satisfies the abstract contract from `User`, symmetric with `Trainer.getRole()`.
+
+### M1-4e — `addSkill(Skill skill)`
+
+```
+// TODO M1-4e: validate skill is not null, then add it to the list
+```
+
+Pattern (identical reasoning to `enrollTrainee` in Trainer):
+```java
+if (skill == null) throw new IllegalArgumentException("skill must not be null");
+skills.add(skill);
+```
+
+### M1-4f — `getSkills()`
+
+```
+// TODO M1-4f: return Collections.unmodifiableList(skills)
+```
+
+Same defensive-view pattern as `getRoster()` in `Trainer`.
+Remember to import `java.util.Collections` if it is not already imported.
+
+### M1-4g — `getEnrolledCourse()`
+
+```
+// TODO M1-4g: return enrolledCourse
+```
+
+Simple single-expression getter — one line.
+
+### M1-4h — `setEnrolledCourse(String enrolledCourse)`
+
+```
+// TODO M1-4h: assign the parameter to the field
+```
+
+One line: `this.enrolledCourse = enrolledCourse;`
+The `this.` prefix is required here because the parameter name shadows the field name.
+
+### M1-4i — `toString()`
+
+```
+// TODO M1-4i: use super.toString() and append course + skills count
 ```
 
 Pattern:
 ```java
-if (trainee == null) throw new IllegalArgumentException("trainee must not be null");
-roster.add(trainee);
+return String.format("Trainee{base=%s, course='%s', skills=%d}",
+        super.toString(), enrolledCourse, skills.size());
 ```
 
-Why validate? Null entries in the roster would cause NullPointerExceptions later when
-iterating — catch the bad input at the boundary.
-
-### M1-3e — `getRoster()`
-
-```
-// TODO M1-3e: return Collections.unmodifiableList(roster)
-//             Remember to import java.util.Collections
-```
-
-`Collections.unmodifiableList` wraps the list so callers can read it but cannot
-call `add()` or `remove()` on it directly. All mutations must go through
-`enrollTrainee()`, which enforces the null-check.
-
-### M1-3f — `toString()`
-
-```
-// TODO M1-3f: use super.toString() for the User part, then append roster size.
-```
-
-Pattern:
-```java
-return String.format("Trainer{base=%s, roster=%d trainee(s)}", super.toString(), roster.size());
-```
-
-Calling `super.toString()` reuses the User representation without duplicating it.
+Reuses `User`'s `toString()` (which already includes id, name, role), then adds the
+Trainee-specific information without repeating any of the parent's fields.
 
 ---
 
-**Your task:** Implement all six TODOs in `src/model/Trainer.java`.
-When you're done, report back and we'll review it and move to M1-4 (`Trainee.java`).
+**Your task:** Implement all nine TODOs in `src/model/Trainee.java`.
+When you're done, report back and we'll review it and move to M1-5 (`Skill.java`).
 
 ---
 
@@ -207,8 +279,8 @@ When you're done, report back and we'll review it and move to M1-4 (`Trainee.jav
 
 ### M1 — Files to complete (in order)
 1. ~~`src/model/User.java`~~ ✅ Done
-2. `src/model/Trainer.java` ← **You are here**
-3. `src/model/Trainee.java`
+2. ~~`src/model/Trainer.java`~~ ✅ Done
+3. `src/model/Trainee.java` ← **You are here**
 4. `src/model/Skill.java`
 5. `src/model/SkillAssessor.java`
 
