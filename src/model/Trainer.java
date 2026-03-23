@@ -1,66 +1,100 @@
 package model;
 
 import java.util.ArrayList;
-
+import java.util.List;
+import java.util.Collections;                          
 /**
- * M1-2: Trainer — extends User.
+ * BOILERPLATE — Module 1, Task M1-3
+ * ──────────────────────────────────
+ * Trainer IS-A User who can enrol trainees and assign skills.
  *
- * A Trainer can enroll Trainees into their roster and manage their progress.
- * Concepts demonstrated: inheritance, super() constructor call, ArrayList collection.
+ * Key OOP point: Trainer EXTENDS User, so it inherits all User fields
+ * (userId, name, email, passwordHash) and must call super(...) to initialise
+ * them — it does NOT redeclare them.
+ *
+ * YOUR TASKS (marked // TODO):
+ *   • Add a trainer-specific field: a List<Trainee> for the trainee roster.
+ *   • Complete the constructor (call super, initialise the list).
+ *   • Override getRole() to return "TRAINER".
+ *   • Implement enrollTrainee(Trainee t).
+ *   • Implement getRoster() — returns an unmodifiable view.
+ *   • Implement toString() — extend super.toString().
  */
 public class Trainer extends User {
+    private List<Trainee> roster;
 
-    // Roster of trainees managed by this trainer
-    private ArrayList<Trainee> roster;
+    // ── Trainer-specific field ────────────────────────────────────────────────
+    // TODO M1-3a: declare a private List<Trainee> field called roster
+    //             Why ArrayList? Fast index access; trainer rosters are
+    //             typically iterated, not searched by key.
 
-    // --- Constructor ---
-    public Trainer(String name, String email, String userId) {
-        super(name, email, userId, "TRAINER");   // M1-2: super() call
-        this.roster = new ArrayList<>();
+
+    // ── Constructor ──────────────────────────────────────────────────────────
+    /**
+     * @param userId       unique trainer ID, e.g. "TR-001"
+     * @param name         trainer's full name
+     * @param email        trainer's login email
+     * @param passwordHash hashed password
+     */
+    public Trainer(String userId, String name, String email, String passwordHash) {
+        super(userId,name,email,passwordHash);
+        this.roster=new ArrayList<>();
+        // TODO M1-3b: call super(...) with all four parameters
+        //             Then initialise the roster field to a new ArrayList<>()
     }
 
-    // --- Abstract method implementations ---
 
-    @Override
-    public boolean login(String password) {
-        // Placeholder: real authentication will use JDBC in M3
-        return password != null && !password.isEmpty();
-    }
-
+    // ── Override abstract method ─────────────────────────────────────────────
+    /**
+     * Returns the role label for a Trainer.
+     * @return "TRAINER"
+     */
     @Override
     public String getRole() {
+        // TODO M1-3c: return the string "TRAINER"
         return "TRAINER";
     }
 
-    // --- Roster management ---
+
+    // ── Trainer behaviour ─────────────────────────────────────────────────────
 
     /**
-     * Enroll a Trainee into this trainer's roster.
-     * M1-2: enrollTrainee method
-     *
-     * @param trainee the Trainee to add
+     * Adds a Trainee to this trainer's roster.
+     * @param trainee the Trainee to enrol (must not be null)
+     * @throws IllegalArgumentException if trainee is null
      */
     public void enrollTrainee(Trainee trainee) {
-        if (trainee != null && !roster.contains(trainee)) {
-            roster.add(trainee);
-            System.out.println("Enrolled: " + trainee.getName() + " under trainer " + this.name);
+        // TODO M1-3d: validate that trainee is not null (throw IllegalArgumentException if so)
+        //             Then add trainee to the roster list.
+        if(trainee==null)
+        {
+            throw new IllegalArgumentException("Trainee cannot be null");
         }
+        this.roster.add(trainee);
     }
 
-    /** Returns the full trainee roster. */
-    public ArrayList<Trainee> getRoster() {
-        return roster;
+    /**
+     * Returns a read-only view of the trainer's roster.
+     * Why unmodifiable? Callers should not add trainees except through
+     * enrollTrainee(), which enforces the null-check.
+     *
+     * @return unmodifiable List of Trainees
+     */
+    public List<Trainee> getRoster() {
+
+        // TODO M1-3e: return Collections.unmodifiableList(roster)
+        //             Remember to import java.util.Collections
+        return Collections.unmodifiableList(roster);
     }
 
-    /** Prints all trainees in the roster. */
-    public void printRoster() {
-        System.out.println("=== Roster for Trainer: " + name + " ===");
-        if (roster.isEmpty()) {
-            System.out.println("  (no trainees enrolled)");
-        } else {
-            for (Trainee t : roster) {
-                System.out.println("  - " + t);
-            }
-        }
+
+    // ── toString ─────────────────────────────────────────────────────────────
+    /**
+     * @return e.g. "Trainer{base=User{id='TR-001', name='Riya', role='TRAINER'}, roster=2 trainee(s)}"
+     */
+    @Override
+    public String toString() {
+        // TODO M1-3f: use super.toString() for the User part, then append roster size.
+        return "Trainer{base="+super.toString()+", roster="+this.roster.size()+" trainee(s)";
     }
 }

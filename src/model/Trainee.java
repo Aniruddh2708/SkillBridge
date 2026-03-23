@@ -35,6 +35,10 @@ public class Trainee extends User implements Serializable {
     // Example first line (uncomment and fill in the rest):
     //   private ArrayList<String> enrolledSkills;
     // -------------------------------------------------------------------------
+    private ArrayList<String> enrolledSkills;
+    private String trainerId;
+    private int completionPercent;
+    private boolean isCertified;
 
     // -------------------------------------------------------------------------
     // TODO 2 — CONSTRUCTOR
@@ -49,6 +53,10 @@ public class Trainee extends User implements Serializable {
     public Trainee(String name, String email, String userId, String trainerId) {
         super(name, email, userId, "TRAINEE");  // TODO 2: super() call is done — now init the rest
         // TODO 2: initialise enrolledSkills, trainerId, completionPercent, isCertified
+        this.enrolledSkills=new ArrayList<>();
+        this.trainerId=trainerId;
+        this.completionPercent=0;
+        this.isCertified=false;
     }
 
     // -------------------------------------------------------------------------
@@ -76,7 +84,7 @@ public class Trainee extends User implements Serializable {
     @Override
     public String getRole() {
         // TODO 4: replace this stub with the correct return value
-        return "";
+        return "TRAINEE";
     }
 
     // -------------------------------------------------------------------------
@@ -90,6 +98,12 @@ public class Trainee extends User implements Serializable {
     //           System.out.println(name + " enrolled in: " + skillName);
     //       }
     //   }
+    public void enrollInSkill(String skillName){
+        if(!enrolledSkills.contains(skillName)){
+            enrolledSkills.add(skillName);
+            System.out.println(name+"enrolled in: "+skillName);
+        }
+    }
     // -------------------------------------------------------------------------
 
     // -------------------------------------------------------------------------
@@ -105,6 +119,15 @@ public class Trainee extends User implements Serializable {
     //           System.out.println("🏅 " + name + " is now certified!");
     //       }
     //   }
+    public void updateProgress(int percent)
+    {
+        this.completionPercent=Math.max(0,Math.min(100,percent));
+        if(this.completionPercent>=100)
+        {
+            isCertified=true;
+            System.out.println("🏅 " + name + " is now certified!");
+        }
+    }
     // -------------------------------------------------------------------------
 
     // -------------------------------------------------------------------------
@@ -120,16 +143,43 @@ public class Trainee extends User implements Serializable {
     //       System.out.println("Certified: " + isCertified);
     //   }
     // -------------------------------------------------------------------------
+    public void exportPortfolio(){
+        System.out.println("=== Portfolio: " + name + " ===");
+        System.out.println("Email  : " + email);
+        System.out.println("Skills : " + enrolledSkills);
+        System.out.println("Progress: " + completionPercent + "%");
+        System.out.println("Certified: " + isCertified);
+    }
 
     // -------------------------------------------------------------------------
     // TODO 8 — GETTERS
     // Add getters for all four fields you declared in TODO 1:
     //   getEnrolledSkills(), getTrainerId(), getCompletionPercent(), isCertified()
     // -------------------------------------------------------------------------
-
+    public ArrayList<String> getEnrolledSkills()
+    {
+        return enrolledSkills;
+    }
+    public String getTrainerId()
+    {
+        return trainerId;
+    }
+    public int getCompletionPercent()
+    {
+        return completionPercent;
+    }
+    public boolean isCertified()
+    {
+        return isCertified;
+    }
     // -------------------------------------------------------------------------
     // TODO 9 — toString()  (optional but recommended)
     // Override toString() to return a one-line summary, e.g.:
     //   "[TRAINEE] Alice <alice@example.com> (ID: T001) — 75% complete"
     // -------------------------------------------------------------------------
+    @Override
+    public String toString()
+    {
+        return "[TRAINEE] "+name +"<"+email+"> (ID: "+userId+") -"+completionPercent+"% complete";
+    }
 }

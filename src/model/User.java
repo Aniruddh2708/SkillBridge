@@ -31,16 +31,26 @@ public abstract class User {
 
     // --- Concrete getters / setters ---
 
-    public String getName()    { return name; }
-    public String getEmail()   { return email; }
-    public String getUserId()  { return userId; }
+    public String getName()    { 
+        return name; 
+    }
+    public String getEmail()   { 
+        return email; 
+    }
+    public String getUserId()  { 
+        return userId; 
+    }
 
-    public void setName(String name)    { this.name  = name; }
-    public void setEmail(String email)  { this.email = email; }
+    public void setName(String name)    { 
+        this.name  = name; 
+    }
+    public void setEmail(String email)  { 
+        this.email = email; 
+    }
 
-    // --- toString ---
+    // --- toString ---User{id='TR-001', name='Riya', role='TRAINER'}
     @Override
     public String toString() {
-        return "[" + role + "] " + name + " <" + email + "> (ID: " + userId + ")";
+        return "User{id='"+userId+"', name='"+name+"', role='"+getRole();
     }
 }
