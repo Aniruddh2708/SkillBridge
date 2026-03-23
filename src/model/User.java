@@ -21,10 +21,12 @@ public abstract class User {
         this.role   = role;
     }
 
-    // --- Abstract methods (subclasses MUST implement) ---
+    // --- Methods ---
 
-    /** Authenticate the user. Returns true if credentials are valid. */
-    public abstract boolean login(String password);
+    /** Authenticate the user. Subclasses override this for real auth (M3). */
+    public boolean login(String password) {
+        return false;
+    }
 
     /** Returns the role string for this user ("TRAINER" or "TRAINEE"). */
     public abstract String getRole();
