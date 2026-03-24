@@ -15,8 +15,8 @@
 
 | Module | Topic | Status |
 |--------|-------|--------|
-| M1 | Core data models & OOP structure | 🔄 **In Progress** |
-| M2 | Certification & Progress logic | ⬜ Not started |
+| M1 | Core data models & OOP structure | ✅ **Done** |
+| M2 | Certification & Progress logic | 🔄 **In Progress** |
 | M3 | Data Persistence — JDBC + MySQL | ⬜ Not started |
 | M4 | Skill-Visibility Portal — JavaFX GUI | ⬜ Not started |
 
@@ -24,10 +24,16 @@
 
 - [x] **M1-1** Understand *why* `User` is abstract — concept discussion ✅
 - [x] **M1-2** Complete `User.java` TODOs (fields, constructor, abstract method, getters, `toString`) ✅
-- [ ] **M1-3** Complete `Trainer.java` TODOs (override `getRole`, trainer-specific fields)
-- [ ] **M1-4** Complete `Trainee.java` TODOs (override `getRole`, `Serializable`, trainee-specific fields)
-- [ ] **M1-5** Complete `Skill.java` TODOs (skill model, enums, completion flag)
-- [ ] **M1-6** Complete `SkillAssessor.java` TODOs (abstract assessor, polymorphism demo)
+- [x] **M1-3** Complete `Trainer.java` TODOs (override `getRole`, trainer-specific fields) ✅
+- [x] **M1-4** Complete `Trainee.java` TODOs (override `getRole`, `Serializable`, trainee-specific fields) ✅
+- [x] **M1-5** Complete `Skill.java` TODOs (skill model, enums, completion flag) ✅
+- [x] **M1-6** Complete `SkillAssessor.java` TODOs (abstract assessor, polymorphism demo) ✅
+
+### M2 Checklist
+
+- [ ] **M2-1** Complete `BasicAssessor.java` TODOs (first concrete SkillAssessor, bridges M1 → M2)
+- [ ] **M2-2** Complete `AuthService.java` TODOs (login service, throws AuthException)
+- [ ] **M2-3** Complete `UserDAO.java` TODOs (in-memory store + credential check)
 
 ---
 
@@ -203,18 +209,135 @@ When you're done, report back and we'll review it and move to M1-4 (`Trainee.jav
 
 ---
 
+## ✅ M1-3 to M1-6 Complete — Module 1 Finished! 🎉
+
+You've completed all six M1 tasks. Here's a quick summary of what you built:
+
+| Task | File | Key concept reinforced |
+|------|------|------------------------|
+| M1-3 | `Trainer.java` | Inheritance + `super()`, defensive null-check, unmodifiable list |
+| M1-4 | `Trainee.java` | `Serializable` marker interface, list management |
+| M1-5 | `Skill.java` | `enum` for type-safe categories, `boolean` flag, immutable fields |
+| M1-6 | `SkillAssessor.java` | Abstract class as a strategy contract, late binding in `describeResult()` |
+
+---
+
+## 💡 Your Enum Observation — Trade-offs of Enum vs Polymorphism
+
+You noted: *"In an enum-based design, adding EXPERT is just adding another constant to the
+enum — same kind of change-and-hope fragility as raw Strings."*
+
+**That's a sharp observation.** Let's break down when each design wins:
+
+### When enums ARE the right call ✅
+
+| Situation | Why enum wins |
+|-----------|---------------|
+| Small, **stable**, well-known set of values | Compile-time safety — `Category.ELECTRRICAL` (typo!) fails at compile time; `"ELECTRRICAL"` as a String would not |
+| You want exhaustive `switch` coverage | Java warns/errors if you miss a case |
+| Values carry no *behaviour* — just identity | Enum is lightweight; no extra class files |
+
+`Skill.Category` (ELECTRICAL, PLUMBING, CARPENTRY …) is a good enum:
+the vocational categories are known at design time and don't carry separate logic.
+
+### When enums hit their limits ❌
+
+| Situation | Why enum struggles |
+|-----------|--------------------|
+| Values need to be **added by third-party code** | You can't extend a sealed enum |
+| Each value needs **different behaviour** | An enum method with a big `switch` is fragile |
+| The set **grows at runtime** (config-driven) | Enums are fixed at compile time |
+
+### What SkillAssessor does instead 🔑
+
+Notice that the assessment *strategy* (basic vs advanced) is **not** an enum constant
+— it is a **class hierarchy**:
+
+```
+SkillAssessor (abstract)
+  ├── BasicAssessor    ← simple: passes if skill.isCompleted()
+  └── AdvancedAssessor ← weighted score + threshold (M2-2)
+```
+
+Adding an `ExpertAssessor` later means writing **one new class** — existing code is
+untouched. This is the **Open/Closed Principle**: open for extension, closed for modification.
+
+The general rule of thumb:
+> Use an **enum** when the set is fixed and values are *identities*.  
+> Use a **class hierarchy** (or interface) when each variant has *different behaviour*
+> that may need to grow.
+
+---
+
+## 🔓 M2-1 Unlocked — `BasicAssessor.java`
+
+Before you touch the code, answer this concept question:
+
+### Concept Question for M2-1
+
+> **"`BasicAssessor` does NOT override `describeResult()` — it only overrides `assess()`.
+> When you call `assessor.describeResult(skill)` on a `BasicAssessor` instance,
+> trace the exact call chain: which method in which class runs first, second, and third?"**
+>
+> *(Hint: start at the call site and follow the method calls through `SkillAssessor`
+> and then back down into `BasicAssessor`.)*
+
+---
+
+Once you've answered, open `src/model/BasicAssessor.java` and work through the two TODOs:
+
+### M2-1a — Constructor
+
+```
+// TODO M2-1a: implement the constructor.
+//             It receives a Trainee and passes it straight to super(...)
+```
+
+One line: `super(trainee);`
+
+`BasicAssessor` has no extra state of its own — it is a *pure strategy*.
+All state (the trainee reference) lives in the parent `SkillAssessor`.
+
+### M2-1b — `assess(Skill skill)`
+
+```
+// TODO M2-1b: implement assess(Skill skill).
+//             A basic assessment simply checks whether the skill is completed.
+//             Return true if skill.isCompleted(), false otherwise.
+```
+
+One line: `return skill.isCompleted();`
+
+Why so simple? `BasicAssessor` is the entry-level strategy — it trusts the
+`markCompleted()` flag that the Trainer sets on a Skill.
+`AdvancedAssessor` (M2-2) will add weighted scores for a more rigorous check.
+
+### What you do NOT need to write 📌
+
+`describeResult()` is already implemented in `SkillAssessor` and is **inherited**
+automatically. Once `assess()` is in place, calling
+`assessor.describeResult(skill)` will use your `assess()` via late binding.
+
+---
+
+**Your task:** Implement the two TODOs in `src/model/BasicAssessor.java`.
+When you're done, report back and we'll review it and move to M2-2 (`AuthService.java`).
+
+---
+
 ## 🗂️ Module Roadmap
 
-### M1 — Files to complete (in order)
-1. ~~`src/model/User.java`~~ ✅ Done
-2. `src/model/Trainer.java` ← **You are here**
-3. `src/model/Trainee.java`
-4. `src/model/Skill.java`
-5. `src/model/SkillAssessor.java`
+### M1 — Files (complete ✅)
+1. ~~`src/model/User.java`~~ ✅
+2. ~~`src/model/Trainer.java`~~ ✅
+3. ~~`src/model/Trainee.java`~~ ✅
+4. ~~`src/model/Skill.java`~~ ✅
+5. ~~`src/model/SkillAssessor.java`~~ ✅
 
-### M2 — Files (unlocked after M1)
-- `src/service/AuthException.java`
-- Extend `UserDAO` with credential-check logic
+### M2 — Files (unlocked) ← **You are here**
+1. `src/model/BasicAssessor.java` ← **current task**
+2. `src/service/AuthService.java`
+3. `src/model/UserDAO.java`
 
 ### M3 — Files (unlocked after M2)
 - `src/db/DBConnection.java`
