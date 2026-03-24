@@ -15,8 +15,8 @@
 
 | Module | Topic | Status |
 |--------|-------|--------|
-| M1 | Core data models & OOP structure | 🔄 **In Progress** |
-| M2 | Certification & Progress logic | ⬜ Not started |
+| M1 | Core data models & OOP structure | ✅ **Complete** |
+| M2 | Certification & Progress logic | 🔄 **In Progress** |
 | M3 | Data Persistence — JDBC + MySQL | ⬜ Not started |
 | M4 | Skill-Visibility Portal — JavaFX GUI | ⬜ Not started |
 
@@ -24,10 +24,16 @@
 
 - [x] **M1-1** Understand *why* `User` is abstract — concept discussion ✅
 - [x] **M1-2** Complete `User.java` TODOs (fields, constructor, abstract method, getters, `toString`) ✅
-- [ ] **M1-3** Complete `Trainer.java` TODOs (override `getRole`, trainer-specific fields)
-- [ ] **M1-4** Complete `Trainee.java` TODOs (override `getRole`, `Serializable`, trainee-specific fields)
-- [ ] **M1-5** Complete `Skill.java` TODOs (skill model, enums, completion flag)
-- [ ] **M1-6** Complete `SkillAssessor.java` TODOs (abstract assessor, polymorphism demo)
+- [x] **M1-3** Complete `Trainer.java` TODOs (override `getRole`, trainer-specific fields) ✅
+- [x] **M1-4** Complete `Trainee.java` TODOs (override `getRole`, `Serializable`, trainee-specific fields) ✅
+- [x] **M1-5** Complete `Skill.java` TODOs (skill model, enums, completion flag) ✅
+- [x] **M1-6** Complete `SkillAssessor.java` TODOs (abstract assessor, polymorphism demo) ✅
+
+### M2 Checklist
+
+- [ ] **M2-1** Understand checked vs unchecked exceptions — concept question
+- [ ] **M2-2** Complete `AuthService.java` TODOs (login logic, AuthException)
+- [ ] **M2-3** Complete `BasicAssessor.java` TODOs (concrete assessor subclass)
 
 ---
 
@@ -203,21 +209,136 @@ When you're done, report back and we'll review it and move to M1-4 (`Trainee.jav
 
 ---
 
+## ✅ M1-5 & M1-6 Complete — Enum Observation + Review
+
+Great work finishing `Skill.java` and `SkillAssessor.java`! You also made a really sharp observation about enum design:
+
+> *"in an enum based design we will just write another field called EXPERT with string ig same problems as before chances of error"*
+
+### Feedback on the enum observation 📌
+
+You're **half right** — and spotting that nuance is a sign of good engineering instincts.
+
+| What you correctly noticed | The part enums still win at |
+|---|---|
+| Adding `EXPERT` to an enum still requires a code change and recompilation | A typo like `"EXEPERT"` in a String compiles silently; `SkillLevel.EXEPERT` is a **compile error** |
+| Both approaches need the developer to remember the new value | `switch` statements over enums give a compiler warning if you forget to handle a new case |
+| Neither prevents forgetting to add EXPERT entirely | With Strings, `"EXPRT"` passes through unnoticed at runtime; enums reject it at compile time |
+
+**The key insight:** enums don't eliminate *intentional* changes — they eliminate *accidental* errors.
+When you add `EXPERT` to an enum, every place that uses `SkillLevel` and forgets to handle `EXPERT`
+in a `switch` gets a compiler warning. With a String constant, nothing warns you.
+
+---
+
+## 🔓 M2 Unlocked — Certification & Progress Logic
+
+All five model classes are done. Now we build the **service layer** — the business logic that *uses* those models.
+
+M2 introduces two new concepts:
+1. **Checked exceptions** (`AuthException`) — enforcing error handling at compile time.
+2. **Concrete assessors** (`BasicAssessor`) — fulfilling the abstract contract you defined in M1-6.
+
+### Concept Question for M2-1
+
+> **"Look at `src/service/AuthException.java`. It `extends Exception`, not `RuntimeException`.**
+> **What is the practical difference between a *checked* exception and an *unchecked* exception?**
+> **Why should an authentication failure be *checked* rather than *unchecked*?"**
+>
+> *(Hint: think about what the compiler forces the caller to do in each case.)*
+
+---
+
+Once you've answered, open the two new skeleton files and work through them in order:
+
+### M2-2 — `AuthService.java`
+
+Open `src/service/AuthService.java`. There are six TODOs:
+
+**M2-1a — `List<User> userStore` field**
+```
+// TODO M2-1a: declare a private final List<User> field called userStore
+```
+- `List<User>` holds both `Trainer` and `Trainee` objects — polymorphism at work.
+- `final` because the store reference should never be swapped out after construction.
+
+**M2-1b — Constructor**
+```
+// TODO M2-1b: validate that userStore is not null, then assign to the field
+```
+Null check first, then `this.userStore = userStore;`.
+
+**M2-1c / 1d / 1e — `login(String email, String password) throws AuthException`**
+```
+// TODO M2-1c: iterate over userStore with a for-each loop
+// TODO M2-1d: on email match, verify password or throw AuthException
+// TODO M2-1e: after the loop, throw AuthException for no match
+```
+Pattern:
+```java
+for (User user : userStore) {
+    if (user.getEmail().equalsIgnoreCase(email)) {
+        if (!checkPassword(user, password)) {
+            throw new AuthException("Invalid password for: " + email);
+        }
+        return user;
+    }
+}
+throw new AuthException("No account found for: " + email);
+```
+
+**M2-1f — `checkPassword(User user, String password)` private helper**
+```
+// TODO M2-1f: return true if password equals user.getPasswordHash()
+```
+One line: `return password.equals(user.getPasswordHash());`
+*(Real hashing with BCrypt comes in Module 3.)*
+
+### M2-3 — `BasicAssessor.java`
+
+Open `src/model/BasicAssessor.java`. There are three TODOs:
+
+**M2-2a — Constructor**
+```
+// TODO M2-2a: call super(trainee)
+```
+One line. `SkillAssessor`'s constructor already validates `trainee` — no need to repeat it.
+
+**M2-2b / 2c — `assess(Skill skill)`**
+```
+// TODO M2-2b: validate skill is not null
+// TODO M2-2c: return skill.isCompleted()
+```
+Pattern:
+```java
+if (skill == null) throw new IllegalArgumentException("skill must not be null");
+return skill.isCompleted();
+```
+
+---
+
+**Your task:** Answer the concept question above, then implement all TODOs in
+`AuthService.java` and `BasicAssessor.java`.
+When done, report back for review and we'll move to M3.
+
+---
+
 ## 🗂️ Module Roadmap
 
-### M1 — Files to complete (in order)
-1. ~~`src/model/User.java`~~ ✅ Done
-2. `src/model/Trainer.java` ← **You are here**
-3. `src/model/Trainee.java`
-4. `src/model/Skill.java`
-5. `src/model/SkillAssessor.java`
+### M1 — Files ✅ All complete
+1. ~~`src/model/User.java`~~ ✅
+2. ~~`src/model/Trainer.java`~~ ✅
+3. ~~`src/model/Trainee.java`~~ ✅
+4. ~~`src/model/Skill.java`~~ ✅
+5. ~~`src/model/SkillAssessor.java`~~ ✅
 
-### M2 — Files (unlocked after M1)
-- `src/service/AuthException.java`
-- Extend `UserDAO` with credential-check logic
+### M2 — Files (in progress) ← **You are here**
+- ~~`src/service/AuthException.java`~~ ✅ (pre-built, read the Javadoc)
+- `src/service/AuthService.java` ← TODOs M2-1a to M2-1f
+- `src/model/BasicAssessor.java` ← TODOs M2-2a to M2-2c
 
 ### M3 — Files (unlocked after M2)
-- `src/db/DBConnection.java`
+- `src/db/DBConnection.java` (skeleton ready)
 - `src/db/UserDAO.java` (persistence layer)
 - `db/skillbridge.sql`
 
