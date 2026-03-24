@@ -2,112 +2,184 @@ package model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.List;
 
 /**
- * BOILERPLATE — Module 1, Task M1-4
- * ──────────────────────────────────
- * Trainee IS-A User who is enrolled in vocational training.
+ * M1-3: Trainee — extends User, implements Serializable.
  *
- * Extra interface: Serializable
- *   Implementing Serializable lets Java convert a Trainee object into a
- *   byte stream — we use this in Module 4 to export a trainee's portfolio
- *   to disk.  It requires no method implementation; it is a MARKER interface.
- *   The serialVersionUID constant pins the class version so a saved file
- *   doesn't break if the class changes slightly later.
+ * Represents a vocational trainee in the SkillBridge system.
+ * Concepts demonstrated:
+ *   - Inheritance (extends User)
+ *   - Interface implementation (Serializable — needed for portfolio file export in M2)
+ *   - ArrayList collection for enrolled skills
+ *   - Encapsulation via private fields + getters/setters
  *
- * YOUR TASKS (marked // TODO):
- *   • Add trainee-specific fields (skills list, enrolledCourse).
- *   • Complete the constructor.
- *   • Override getRole() to return "TRAINEE".
- *   • Implement addSkill(Skill s) and getSkills().
- *   • Implement getEnrolledCourse() / setEnrolledCourse().
- *   • Implement toString().
+ * ────────────────────────────────────────────────────────────────────────────
+ * YOUR TASKS FOR M1-3
+ * Work through every TODO block below in order.  Each block tells you exactly
+ * what to type and which Java concept it demonstrates.
+ * ────────────────────────────────────────────────────────────────────────────
  */
 public class Trainee extends User implements Serializable {
 
-    // Required when implementing Serializable.
-    // If you change the class fields later, increment this number so that
-    // previously-serialised files are rejected gracefully instead of corrupting.
+    // Required by Serializable — keeps the serialized format stable.
     private static final long serialVersionUID = 1L;
 
+    // -------------------------------------------------------------------------
+    // TODO 1 — FIELDS
+    // Declare four private fields:
+    //   (a) ArrayList<String>  enrolledSkills   — skills this trainee is studying
+    //   (b) String             trainerId        — ID of the Trainer who manages them
+    //   (c) int                completionPercent — overall progress 0–100
+    //   (d) boolean            isCertified      — true once all skills are complete
+    //
+    // Example first line (uncomment and fill in the rest):
+    //   private ArrayList<String> enrolledSkills;
+    // -------------------------------------------------------------------------
+    private ArrayList<String> enrolledSkills;
+    private String trainerId;
+    private int completionPercent;
+    private boolean isCertified;
 
-    // ── Trainee-specific fields ───────────────────────────────────────────────
-
-    // TODO M1-4a: declare a private List<Skill> field called skills
-    //             (the skills this trainee has been assigned or completed)
-
-    // TODO M1-4b: declare a private String field called enrolledCourse
-    //             (e.g. "Electrical Wiring Basics")
-
-
-    // ── Constructor ──────────────────────────────────────────────────────────
-    /**
-     * @param userId          unique trainee ID, e.g. "TN-042"
-     * @param name            trainee's full name
-     * @param email           trainee's login email
-     * @param passwordHash    hashed password
-     * @param enrolledCourse  name of the vocational course
-     */
-    public Trainee(String userId, String name, String email,
-                   String passwordHash, String enrolledCourse) {
-        // TODO M1-4c: call super(...) with userId, name, email, passwordHash
-        //             Then initialise the skills list and assign enrolledCourse.
+    // -------------------------------------------------------------------------
+    // TODO 2 — CONSTRUCTOR
+    // Write a constructor:  Trainee(String name, String email, String userId, String trainerId)
+    //   • Call super(name, email, userId, "TRAINEE") — this sets the inherited fields.
+    //   • Initialise enrolledSkills to a new empty ArrayList.
+    //   • Set this.trainerId = trainerId.
+    //   • Set completionPercent = 0 and isCertified = false.
+    //
+    // Replace the stub below with your full implementation.
+    // -------------------------------------------------------------------------
+    public Trainee(String name, String email, String userId, String trainerId) {
+        super(name, email, userId, "TRAINEE");  // TODO 2: super() call is done — now init the rest
+        // TODO 2: initialise enrolledSkills, trainerId, completionPercent, isCertified
+        this.enrolledSkills=new ArrayList<>();
+        this.trainerId=trainerId;
+        this.completionPercent=0;
+        this.isCertified=false;
     }
 
+    // -------------------------------------------------------------------------
+    // TODO 3 — OVERRIDE login()
+    // The abstract method login(String password) from User must be implemented.
+    // For now, return true if password is not null and not empty — real auth
+    // will come in M3 with JDBC.
+    //
+    // Replace the stub body below with your implementation:
+    //   return password != null && !password.isEmpty();
+    // -------------------------------------------------------------------------
+    @Override
+    public boolean login(String password) {
+        // TODO 3: replace this stub with your real check
+        return password != null && !password.isEmpty();
+    }
 
-    // ── Override abstract method ─────────────────────────────────────────────
-    /**
-     * @return "TRAINEE"
-     */
+    // -------------------------------------------------------------------------
+    // TODO 4 — OVERRIDE getRole()
+    // Return the string "TRAINEE".
+    //
+    // Replace the stub body below with:
+    //   return "TRAINEE";
+    // -------------------------------------------------------------------------
     @Override
     public String getRole() {
-        // TODO M1-4d: return the string "TRAINEE"
-        return null;
+        // TODO 4: replace this stub with the correct return value
+        return "TRAINEE";
     }
 
+    // -------------------------------------------------------------------------
+    // TODO 5 — enrollInSkill(String skillName)
+    // Add skillName to enrolledSkills if it is not already present.
+    // Print a confirmation message.
+    //
+    //   public void enrollInSkill(String skillName) {
+    //       if (!enrolledSkills.contains(skillName)) {
+    //           enrolledSkills.add(skillName);
+    //           System.out.println(name + " enrolled in: " + skillName);
+    //       }
+    //   }
+    public void enrollInSkill(String skillName){
+        if(!enrolledSkills.contains(skillName)){
+            enrolledSkills.add(skillName);
+            System.out.println(name+" enrolled in: "+skillName);
+        }
+    }
+    // -------------------------------------------------------------------------
 
-    // ── Skill management ─────────────────────────────────────────────────────
+    // -------------------------------------------------------------------------
+    // TODO 6 — updateProgress(int percent)
+    // Set completionPercent to percent (clamp between 0 and 100).
+    // If percent >= 100, also set isCertified = true and print a
+    // congratulations message.
+    //
+    //   public void updateProgress(int percent) {
+    //       this.completionPercent = Math.max(0, Math.min(100, percent));
+    //       if (this.completionPercent >= 100) {
+    //           isCertified = true;
+    //           System.out.println("🏅 " + name + " is now certified!");
+    //       }
+    //   }
+    public void updateProgress(int percent)
+    {
+        this.completionPercent=Math.max(0,Math.min(100,percent));
+        if(this.completionPercent>=100)
+        {
+            isCertified=true;
+            System.out.println("🏅 " + name + " is now certified!");
+        }
+    }
+    // -------------------------------------------------------------------------
 
-    /**
-     * Assigns a new Skill to this trainee.
-     * @param skill the Skill to add (must not be null)
-     * @throws IllegalArgumentException if skill is null
-     */
-    public void addSkill(Skill skill) {
-        // TODO M1-4e: validate skill is not null, then add it to the list
+    // -------------------------------------------------------------------------
+    // TODO 7 — exportPortfolio()
+    // Print a formatted summary of this trainee's portfolio to the console.
+    // Real file export will come in M2 (PortfolioExporter.java).
+    //
+    //   public void exportPortfolio() {
+    //       System.out.println("=== Portfolio: " + name + " ===");
+    //       System.out.println("Email  : " + email);
+    //       System.out.println("Skills : " + enrolledSkills);
+    //       System.out.println("Progress: " + completionPercent + "%");
+    //       System.out.println("Certified: " + isCertified);
+    //   }
+    // -------------------------------------------------------------------------
+    public void exportPortfolio(){
+        System.out.println("=== Portfolio: " + name + " ===");
+        System.out.println("Email  : " + email);
+        System.out.println("Skills : " + enrolledSkills);
+        System.out.println("Progress: " + completionPercent + "%");
+        System.out.println("Certified: " + isCertified);
     }
 
-    /**
-     * Returns the trainee's skill list (read-only).
-     * @return unmodifiable List of Skills
-     */
-    public List<Skill> getSkills() {
-        // TODO M1-4f: return Collections.unmodifiableList(skills)
-        return null;
+    // -------------------------------------------------------------------------
+    // TODO 8 — GETTERS
+    // Add getters for all four fields you declared in TODO 1:
+    //   getEnrolledSkills(), getTrainerId(), getCompletionPercent(), isCertified()
+    // -------------------------------------------------------------------------
+    public ArrayList<String> getEnrolledSkills()
+    {
+        return enrolledSkills;
     }
-
-
-    // ── Enrolled course ──────────────────────────────────────────────────────
-
-    public String getEnrolledCourse() {
-        // TODO M1-4g: return enrolledCourse
-        return null;
+    public String getTrainerId()
+    {
+        return trainerId;
     }
-
-    public void setEnrolledCourse(String enrolledCourse) {
-        // TODO M1-4h: assign the parameter to the field
-        //             (a trainee CAN switch course, so a setter is appropriate here)
+    public int getCompletionPercent()
+    {
+        return completionPercent;
     }
-
-
-    // ── toString ─────────────────────────────────────────────────────────────
-    /**
-     * @return e.g. "Trainee{base=..., course='Electrical Wiring Basics', skills=3}"
-     */
+    public boolean isCertified()
+    {
+        return isCertified;
+    }
+    // -------------------------------------------------------------------------
+    // TODO 9 — toString()  (optional but recommended)
+    // Override toString() to return a one-line summary, e.g.:
+    //   "[TRAINEE] Alice <alice@example.com> (ID: T001) — 75% complete"
+    // -------------------------------------------------------------------------
     @Override
-    public String toString() {
-        // TODO M1-4i: use super.toString() and append course + skills count
-        return null;
+    public String toString()
+    {
+        return "[TRAINEE] "+name+" <"+email+"> (ID: "+userId+") - "+completionPercent+"% complete";
     }
 }

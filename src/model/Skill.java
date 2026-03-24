@@ -1,103 +1,103 @@
 package model;
 
 /**
- * BOILERPLATE — Module 1, Task M1-5
- * ──────────────────────────────────
- * Skill represents a single vocational skill or micro-course
- * (e.g. "Electrical Wiring", "Plumbing Basics").
+ * M1-5: Skill — represents a single vocational skill in the SkillBridge system.
  *
- * New Java concepts introduced here:
- *   • enum  — a fixed set of named constants (better than raw Strings for status).
- *   • boolean completed — simple flag to track whether the trainee finished.
+ * Concepts demonstrated:
+ *   - Enums  (SkillLevel: BEGINNER / INTERMEDIATE / ADVANCED)
+ *   - Encapsulation via private fields + getters
+ *   - A boolean completion flag managed through a dedicated method
+ *   - toString() for clean console output
  *
- * YOUR TASKS (marked // TODO):
- *   • Add fields: skillId, skillName, category, completed.
- *   • Complete the constructor.
- *   • Implement getters.
- *   • Implement markCompleted() — sets completed = true.
- *   • Implement toString().
+ * ─────────────────────────────────────────────────────────────────────────────
+ * YOUR TASKS FOR M1-5
+ * Work through every TODO block below in order.
+ * Each block explains what to write and why.
+ * ─────────────────────────────────────────────────────────────────────────────
  */
 public class Skill {
 
-    // ── Status enum ──────────────────────────────────────────────────────────
-    // Using an enum instead of String prevents typos like "Commplete" at compile time.
-    public enum Category {
-        ELECTRICAL,
-        PLUMBING,
-        CARPENTRY,
-        TAILORING,
-        DIGITAL_LITERACY,
-        OTHER
-    }
+    // -------------------------------------------------------------------------
+    // TODO 1 — NESTED ENUM: SkillLevel
+    //
+    // Define a public enum called SkillLevel INSIDE this class (nested) with
+    // three constants: BEGINNER, INTERMEDIATE, ADVANCED.
+    //
+    // Why an enum instead of plain Strings?
+    //   • A String can hold any value — "BEGGINER" (typo) compiles fine and
+    //     silently breaks comparisons at runtime.
+    //   • An enum is a *closed* set of valid values; a typo is a compile error.
+    //   • IDE auto-complete works; Strings don't benefit from that safety.
+    //
+    // Skeleton:
+    //   public enum SkillLevel {
+    //       BEGINNER, INTERMEDIATE, ADVANCED
+    //   }
+    // -------------------------------------------------------------------------
+    // TODO 1: declare the SkillLevel enum here
 
 
-    // ── Fields ───────────────────────────────────────────────────────────────
-
-    // TODO M1-5a: declare a private final String field called skillId
-    //             (final because a Skill's ID should never change)
-
-    // TODO M1-5b: declare a private final String field called skillName
-
-    // TODO M1-5c: declare a private final Category field called category
-
-    // TODO M1-5d: declare a private boolean field called completed
-    //             (default Java value for boolean is false — appropriate here)
-
-
-    // ── Constructor ──────────────────────────────────────────────────────────
-    /**
-     * @param skillId   unique ID, e.g. "SK-07"
-     * @param skillName human-readable name, e.g. "Electrical Wiring"
-     * @param category  one of the Category enum values
-     */
-    public Skill(String skillId, String skillName, Category category) {
-        // TODO M1-5e: assign all three parameters to their fields.
-        //             Note: completed starts as false automatically.
-    }
+    // -------------------------------------------------------------------------
+    // TODO 2 — FIELDS
+    // Declare four private fields:
+    //   (a) String     skillId      — unique identifier, e.g. "SK-001"
+    //   (b) String     skillName    — human-readable label, e.g. "Java Basics"
+    //   (c) SkillLevel level        — difficulty of this skill
+    //   (d) boolean    isCompleted  — true once the trainee finishes this skill
+    //
+    // All four should be private — callers must use getters / setters.
+    // -------------------------------------------------------------------------
+    // TODO 2: declare the four private fields here
 
 
-    // ── Getters ──────────────────────────────────────────────────────────────
-
-    // TODO M1-5f: implement getSkillId()
-    public String getSkillId() {
-        return null;
-    }
-
-    // TODO M1-5g: implement getSkillName()
-    public String getSkillName() {
-        return null;
-    }
-
-    // TODO M1-5h: implement getCategory()  — returns a Category enum value
-    public Category getCategory() {
-        return null;
-    }
-
-    // TODO M1-5i: implement isCompleted()  — note: boolean getters are named "is..."
-    public boolean isCompleted() {
-        return false; // replace with correct return
-    }
+    // -------------------------------------------------------------------------
+    // TODO 3 — CONSTRUCTOR
+    // Write: public Skill(String skillId, String skillName, SkillLevel level)
+    //   • Assign skillId, skillName, level from parameters.
+    //   • Set isCompleted = false  (a new skill is never completed from the start).
+    //
+    // Why no isCompleted parameter? Because we always start uncompleted —
+    // letting callers pass any value would allow creating a skill that is
+    // "already completed" without any work, which is a logic bug.
+    // -------------------------------------------------------------------------
+    // TODO 3: write the constructor here
 
 
-    // ── Behaviour ────────────────────────────────────────────────────────────
+    // -------------------------------------------------------------------------
+    // TODO 4 — markCompleted()
+    // Write: public void markCompleted()
+    //   • Set isCompleted = true.
+    //   • Print a confirmation message, e.g.:
+    //       System.out.println("✅ Skill '" + skillName + "' marked as completed.");
+    //
+    // Why a dedicated method instead of a plain setter?
+    //   A setter setIsCompleted(boolean) allows callers to pass false and
+    //   "un-complete" a skill, which might be intentional but is surprising.
+    //   A dedicated markCompleted() makes the intent crystal-clear and only
+    //   allows one-way transitions (false → true).
+    // -------------------------------------------------------------------------
+    // TODO 4: write markCompleted() here
 
-    /**
-     * Marks this skill as completed by the trainee.
-     * Once completed, a skill cannot be un-completed
-     * (credentials are final — see Module 2 for the certification flow).
-     */
-    public void markCompleted() {
-        // TODO M1-5j: set completed = true
-    }
+
+    // -------------------------------------------------------------------------
+    // TODO 5 — GETTERS
+    // Add a getter for each field:
+    //   getSkillId(), getSkillName(), getLevel(), isCompleted()
+    //
+    // Note: for a boolean field, the Java convention is isXxx() not getXxx().
+    // -------------------------------------------------------------------------
+    // TODO 5: write the four getters here
 
 
-    // ── toString ─────────────────────────────────────────────────────────────
-    /**
-     * @return e.g. "Skill{id='SK-07', name='Electrical Wiring', category=ELECTRICAL, completed=true}"
-     */
-    @Override
-    public String toString() {
-        // TODO M1-5k: build and return the string shown above
-        return null;
-    }
+    // -------------------------------------------------------------------------
+    // TODO 6 — toString()
+    // Override toString() to return a one-line summary, e.g.:
+    //   "Skill{id='SK-001', name='Java Basics', level=BEGINNER, completed=false}"
+    //
+    // Tip: use String.format() — it keeps formatting readable.
+    //   return String.format(
+    //       "Skill{id='%s', name='%s', level=%s, completed=%b}",
+    //       skillId, skillName, level, isCompleted);
+    // -------------------------------------------------------------------------
+    // TODO 6: override toString() here
 }
