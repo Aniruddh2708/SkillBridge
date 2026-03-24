@@ -1,69 +1,92 @@
 package model;
 
 /**
- * BOILERPLATE — Module 1, Task M1-6
- * ──────────────────────────────────
- * SkillAssessor is an ABSTRACT CLASS that demonstrates polymorphism.
+ * M1-6: SkillAssessor — abstract base for grading strategies.
  *
- * The system has two kinds of assessment:
- *   • BasicAssessor  — simple pass/fail by completion flag.
- *   • AdvancedAssessor — weighted score + threshold (introduced in Module 2).
+ * Concepts demonstrated:
+ *   - Second use of abstract classes (reinforcement)
+ *   - Template-method pattern: the concrete assess() calls abstract helpers
+ *   - Polymorphism: code that works with SkillAssessor works for every
+ *     concrete assessor (PracticalAssessor, WrittenAssessor, etc.)
  *
- * This class holds the shared state (the Trainee being assessed) and
- * declares the abstract contract (assess) that every concrete assessor
- * must fulfil.
- *
- * Why abstract here too (same reasoning as User)?
- *   An "assessor" with no assessment logic is meaningless — you always
- *   need a specific strategy.  The abstract method forces the strategy to
- *   be provided at compile time.
- *
- * YOUR TASKS (marked // TODO):
- *   • Add the trainee field.
- *   • Complete the constructor.
- *   • Implement getTrainee().
- *   • Leave the abstract method signature unchanged.
- *   • Implement the concrete helper describeResult().
+ * ─────────────────────────────────────────────────────────────────────────────
+ * YOUR TASKS FOR M1-6
+ * Work through every TODO block below in order.
+ * ─────────────────────────────────────────────────────────────────────────────
  */
 public abstract class SkillAssessor {
 
-    // ── Field ─────────────────────────────────────────────────────────────────
-    // TODO M1-6a: declare a private final Trainee field called trainee
+    // -------------------------------------------------------------------------
+    // TODO 1 — FIELDS
+    // Declare two protected fields:
+    //   (a) String  assessorId   — unique ID for this assessor instance
+    //   (b) String  assessorName — human-readable name, e.g. "Written Test"
+    //
+    // Why protected (not private)?
+    //   Concrete subclasses (PracticalAssessor, WrittenAssessor) may need to
+    //   include these in their own toString() or logging — protected lets them
+    //   read the values directly without forcing a getter call chain.
+    //   (Compare with User.java where fields were private and subclasses
+    //   use inherited getters — that's a stricter encapsulation style.)
+    // -------------------------------------------------------------------------
+    // TODO 1: declare the two protected fields here
 
-    // ── Constructor ──────────────────────────────────────────────────────────
-    /**
-     * @param trainee the Trainee whose skills are being assessed
-     */
-    protected SkillAssessor(Trainee trainee) {
-        // TODO M1-6b: validate trainee is not null, then assign to field
-    }
 
-    // ── Getter ───────────────────────────────────────────────────────────────
-    public Trainee getTrainee() {
-        // TODO M1-6c: return the trainee field
-        return null;
-    }
+    // -------------------------------------------------------------------------
+    // TODO 2 — CONSTRUCTOR
+    // Write: protected SkillAssessor(String assessorId, String assessorName)
+    //   • Assign both fields with this.xxx = xxx.
+    //   • Mark it protected — same reasoning as User's protected constructor:
+    //     an abstract class cannot be instantiated, so public is misleading.
+    // -------------------------------------------------------------------------
+    // TODO 2: write the protected constructor here
 
-    // ── Abstract method ───────────────────────────────────────────────────────
-    /**
-     * Runs the assessment for a specific skill.
-     *
-     * @param skill the Skill to assess
-     * @return true if the trainee passes the assessment for this skill
-     */
-    public abstract boolean assess(Skill skill);
 
-    // ── Concrete helper ───────────────────────────────────────────────────────
-    /**
-     * Returns a human-readable result string using the result of assess().
-     * This method is CONCRETE because all assessors describe results the same way.
-     *
-     * @param skill the Skill that was assessed
-     * @return e.g. "Riya PASSED Electrical Wiring" or "Riya FAILED Plumbing Basics"
-     */
-    public String describeResult(Skill skill) {
-        // TODO M1-6d: call assess(skill) and build the result string.
-        // Hint: trainee.getName() + (assess(skill) ? " PASSED " : " FAILED ") + skill.getSkillName()
-        return null;
-    }
+    // -------------------------------------------------------------------------
+    // TODO 3 — ABSTRACT METHOD: evaluate(Trainee trainee, Skill skill)
+    // Declare:
+    //   public abstract int evaluate(Trainee trainee, Skill skill);
+    //
+    // This returns a score 0–100.  Each subclass decides HOW to compute it
+    // (practical demo, written test, portfolio review, etc.).
+    //
+    // Why abstract?
+    //   There is no single correct way to assess every skill type — the
+    //   algorithm must be supplied by each concrete subclass.
+    // -------------------------------------------------------------------------
+    // TODO 3: declare the abstract evaluate() method here
+
+
+    // -------------------------------------------------------------------------
+    // TODO 4 — CONCRETE METHOD: assess(Trainee trainee, Skill skill)
+    // Write a concrete method that:
+    //   1. Calls evaluate(trainee, skill) to get the score.
+    //   2. If score >= 80, calls skill.markCompleted() and calls
+    //      trainee.updateProgress(score).
+    //   3. Prints the result either way, e.g.:
+    //        "Assessment by <assessorName>: <trainee.getName()> scored <score>/100"
+    //   4. Returns the score (int).
+    //
+    // This is the TEMPLATE METHOD pattern:
+    //   • assess() defines the skeleton of the algorithm (call evaluate →
+    //     check threshold → update state → print result).
+    //   • evaluate() is the "hot spot" — the part that varies per subclass.
+    //   • Callers only ever call assess(); they never call evaluate() directly.
+    // -------------------------------------------------------------------------
+    // TODO 4: write the concrete assess() method here
+
+
+    // -------------------------------------------------------------------------
+    // TODO 5 — GETTERS
+    // Add getters: getAssessorId(), getAssessorName()
+    // -------------------------------------------------------------------------
+    // TODO 5: write the two getters here
+
+
+    // -------------------------------------------------------------------------
+    // TODO 6 — toString()
+    // Return a one-line summary, e.g.:
+    //   "SkillAssessor{id='SA-001', name='Written Test'}"
+    // -------------------------------------------------------------------------
+    // TODO 6: override toString() here
 }
